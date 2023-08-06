@@ -5,6 +5,7 @@ use App\Codes\Auth\Interfaces\AuthInterface;
 use Illuminate\Support\Facades\Auth;
 
 class AuthService{
+
     /**
      * @var
      */
@@ -25,14 +26,7 @@ class AuthService{
      * @return mixed
      */
     public function login($email, $password){
-        if (Auth::attempt(['email' => $email, 'password' => $password])) {
-            $user = Auth::user();
-            $token = $user->createToken('auth_token')->plainTextToken;
-
-            return response()->json(['token' => $token], 200);
-        }
-
-        return response()->json(['message' => 'Invalid credentials'], 401);
+        return $this->authCheck($email, $password) ? ['token' => $this->createAndFetchToken(Auth::user())] : null;
     }
 
     /**
@@ -43,9 +37,25 @@ class AuthService{
      */
     public function register($email, $name, $password){
         $user = $this->authRepository->register($email, $name, $password);
+        return ['token' => $this->createAndFetchToken($user)];
+    }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+    /**
+     * @param $email
+     * @param $password
+     * @return bool
+     */
+    public function authCheck($email, $password)
+    {
+        return Auth::attempt(['email' => $email, 'password' => $password]);
+    }
 
-        return response()->json(['token' => $token], 200);
+    /**
+     * @param $user
+     * @return mixed
+     */
+    public function createAndFetchToken($user)
+    {
+        return $user->createToken('auth_token')->plainTextToken;
     }
 }

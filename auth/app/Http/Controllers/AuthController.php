@@ -28,7 +28,9 @@ class AuthController extends Controller
      */
     public function login(AuthLoginRequest $request)
     {
-        return $this->authService->login($request->email, $request->password);
+        if ($data = $this->authService->login($request->email, $request->password))
+            return response()->json($data, 200);
+        return response()->json(['message' => 'Invalid credentials'], 401);
     }
 
     /**
@@ -37,6 +39,6 @@ class AuthController extends Controller
      */
     public function register(AuthRegisterRequest $request)
     {
-        return $this->authService->register($request->email, $request->name, $request->password);
+        return response()->json($this->authService->register($request->email, $request->name, $request->password),200);
     }
 }
