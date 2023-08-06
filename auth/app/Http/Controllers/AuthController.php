@@ -31,7 +31,7 @@ class AuthController extends Controller
     {
         if ($data = $this->authService->loginAndFetchToken($request->email, $request->password))
             return RedirectHelper::token($data);
-        return RedirectHelper::unprocessableEntity('Invalid credentials');
+        return RedirectHelper::unprocessableEntity(__('auth.invalidCredentials'));
     }
 
     /**
@@ -42,6 +42,6 @@ class AuthController extends Controller
     {
         if ($data = $this->authService->registerAndFetchToken($request->email, $request->name, $request->password)){
             return RedirectHelper::token($data);
-        }return RedirectHelper::unprocessableEntity('Registration Already Available');
+        }return RedirectHelper::unprocessableEntity(__('auth.registrationAlreadyAvailable'));
     }
 }
