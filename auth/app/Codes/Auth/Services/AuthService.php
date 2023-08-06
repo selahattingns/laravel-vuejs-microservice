@@ -23,10 +23,33 @@ class AuthService{
     /**
      * @param $email
      * @param $password
+     * @return mixed|null
+     */
+    public function loginAndFetchToken($email, $password)
+    {
+        $user = $this->login($email, $password);
+        return $user ? $this->createTokenAndFetchToken($user) : null;
+    }
+
+    /**
+     * @param $email
+     * @param $name
+     * @param $password
+     * @return mixed
+     */
+    public function registerAndFetchToken($email, $name, $password)
+    {
+        $user = $this->register($email, $name, $password);
+        return $user ? $this->createTokenAndFetchToken($user) : null;
+    }
+
+    /**
+     * @param $email
+     * @param $password
      * @return mixed
      */
     public function login($email, $password){
-        return $this->authCheck($email, $password) ? ['token' => $this->createAndFetchToken(Auth::user())] : null;
+        return $this->authCheck($email, $password) ? Auth::user() : null;
     }
 
     /**
@@ -36,8 +59,7 @@ class AuthService{
      * @return mixed
      */
     public function register($email, $name, $password){
-        $user = $this->authRepository->register($email, $name, $password);
-        return ['token' => $this->createAndFetchToken($user)];
+        return empty($this->authRepository->emailCheck($email)) ? $this->authRepository->register($email, $name, $password) : null;
     }
 
     /**
@@ -54,8 +76,8 @@ class AuthService{
      * @param $user
      * @return mixed
      */
-    public function createAndFetchToken($user)
+    public function createTokenAndFetchToken($user)
     {
-        return $user->createToken('auth_token')->plainTextToken;
+        return $user ? $user->createToken('auth_token')->plainTextToken : null;
     }
 }

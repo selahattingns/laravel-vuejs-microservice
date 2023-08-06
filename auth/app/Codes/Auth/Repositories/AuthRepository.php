@@ -20,6 +20,15 @@ class AuthRepository implements AuthInterface {
 
     /**
      * @param $email
+     * @return mixed
+     */
+    public function emailCheck($email)
+    {
+        return $this->model->query()->where('email', $email)->first();
+    }
+
+    /**
+     * @param $email
      * @param $name
      * @param $password
      * @return mixed

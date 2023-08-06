@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Codes\Auth\Services\AuthService;
+use App\Helpers\RedirectHelper;
 use App\Http\Requests\AuthLoginRequest;
 use App\Http\Requests\AuthRegisterRequest;
 
@@ -28,9 +29,9 @@ class AuthController extends Controller
      */
     public function login(AuthLoginRequest $request)
     {
-        if ($data = $this->authService->login($request->email, $request->password))
-            return response()->json($data, 200);
-        return response()->json(['message' => 'Invalid credentials'], 401);
+        if ($data = $this->authService->loginAndFetchToken($request->email, $request->password))
+            return RedirectHelper::token($data);
+        return RedirectHelper::unprocessableEntity('Invalid credentials');
     }
 
     /**
@@ -39,6 +40,8 @@ class AuthController extends Controller
      */
     public function register(AuthRegisterRequest $request)
     {
-        return response()->json($this->authService->register($request->email, $request->name, $request->password),200);
+        if ($data = $this->authService->registerAndFetchToken($request->email, $request->name, $request->password)){
+            return RedirectHelper::token($data);
+        }return RedirectHelper::unprocessableEntity('Registration Already Available');
     }
 }
