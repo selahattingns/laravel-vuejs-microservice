@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<div id="app">
+    <br>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <div class="form-group">
+                <label for="">Email</label>
+                <input class="form-control" type="text" v-model="user.email">
+            </div>
+            <div class="form-group">
+                <label for="">Password</label>
+                <input class="form-control" type="password" v-model="user.password">
+            </div>
+            <button @click="login()" class="btn btn-success" style="margin-right: 10px">Login</button>
+            <button v-if="token && user_id" class="btn btn-warning" @click="logout()">Çıkış Yap</button>
+            <label v-if="token && user_id" style="margin-left: 10px"> id: {{user_id}}</label>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label for="">Name</label>
+                <input class="form-control" type="text" v-model="user.name">
+            </div>
+            <div class="form-group">
+                <label for="">Email</label>
+                <input class="form-control" type="text" v-model="user.email">
+            </div>
+            <div class="form-group">
+                <label for="">Password</label>
+                <input class="form-control" type="password" v-model="user.password">
+            </div>
+            <button @click="register()" class="btn btn-success">Register</button>
+        </div>
+        <div class="col"></div>
+    </div>
+    <br><br><br><br><br><br>
+   <div class="row">
+       <div class="col"></div>
+       <div class="col">
+           <div class="form-group">
+               <label for="">Title</label>
+               <input type="text" class="form-control" v-model="selectedNote.title">
+           </div>
+           <div class="form-group">
+               <label for="">Note</label>
+               <textarea class="form-control" v-model="selectedNote.note"></textarea>
+           </div>
+           <button class="btn btn-primary" @click="addNote()">Add Note</button>
+       </div>
+       <div class="col"></div>
+   </div>
+    <br><br><br><br>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <ul class="list-group">
+                <li v-for="(note, index) in notes" :key="note.id" class="list-group-item">
+                    <span>id: {{note.id}}</span> <br>
+                    <span style="font-weight: bold">{{note.title}}</span> <br>
+                    <span>{{note.note}}</span> <button @click="deleteNote(index, note.id)" class="btn btn-danger">Sil</button>
+                </li>
+            </ul>
+        </div>
+        <div class="col"></div>
+    </div>
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script>
+    const { createApp, ref } = Vue;
+
+    createApp({
+        data(){
+            return {
+                user: {
+                    name: "",
+                    email: "",
+                    password: ""
+                },
+                authApiUrl: "http://localhost:8000/api",
+                notebookApiUrl: "http://localhost:8001/api",
+                token: null,
+                user_id: null,
+                notes: [],
+                selectedNote: {}
+            }
+        },
+        methods: {
+            register(){
+                let thisClass = this;
+                $.ajax({
+                    url: this.authApiUrl + "/register",
+                    method: "post",
+                    data:{
+                        name: thisClass.user.name,
+                        email: thisClass.user.email,
+                        password: thisClass.user.password
+                    },
+                    success: function(result){
+                        thisClass.token = result.data.token ?? null;
+                        alert("ok");
+                    }
+                })
+            },
+            login(){
+                let thisClass = this;
+                $.ajax({
+                    url: this.authApiUrl + "/login",
+                    method: "post",
+                    data:{
+                        email: thisClass.user.email,
+                        password: thisClass.user.password
+                    },
+                    success: function(result){
+                        thisClass.token = result.data.token ?? null;
+                        thisClass.user_id = result.data.user_id ?? null;
+                        localStorage.setItem('token', thisClass.token);
+                        localStorage.setItem('user_id', thisClass.user_id);
+                        thisClass.getNotes();
+                        alert("ok");
+                    }
+                })
+            },
+            logout(){
+                this.token = null;
+                this.user_id = null;
+                this.notes = [];
+            },
+            getNotes(){
+                let thisClass = this;
+                $.ajax({
+                    url: this.notebookApiUrl + "/list",
+                    method: "get",
+                    headers: thisClass.getHeaders(),
+                    success: function(result){
+                        thisClass.notes = result;
+                    }
+                });
+            },
+            addNote(){
+                let thisClass = this;
+                $.ajax({
+                    url: this.notebookApiUrl + "/store",
+                    method: "post",
+                    headers: thisClass.getHeaders(),
+                    data: {
+                        title: this.selectedNote.title,
+                        note: this.selectedNote.note,
+                    },
+                    success: function(result){
+                        thisClass.notes.push(result);
+                    }
+                });
+            },
+            getHeaders(){
+                return {
+                    Authorization: "Bearer " + this.token,
+                    user_id: this.user_id
+                };
+            },
+            deleteNote(index, id){
+                let thisClass = this;
+                $.ajax({
+                    url: this.notebookApiUrl + "/delete/" + id,
+                    method: "post",
+                    headers: thisClass.getHeaders(),
+                    data: { _method: "delete", },
+                    success: function(result){
+                        console.log(result);
+                        thisClass.notes.splice(index,1);
+                    }
+                });
+            }
+        },
+        mounted(){
+            this.token = localStorage.getItem('token', this.token);
+            this.user_id = localStorage.getItem('user_id', this.user_id);
+            this.getNotes();
+        }
+    }).mount('#app')
+</script>
+</body>
+</html>
