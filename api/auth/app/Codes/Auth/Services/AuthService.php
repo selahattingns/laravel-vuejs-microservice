@@ -28,7 +28,7 @@ class AuthService{
     public function loginAndFetchToken($email, $password)
     {
         $user = $this->login($email, $password);
-        return $user ? $this->createTokenAndFetchToken($user) : null;
+        return $user ? ['user_id' => $user->id, 'token' => $this->createTokenAndFetchToken($user)] : null;
     }
 
     /**
@@ -41,6 +41,15 @@ class AuthService{
     {
         $user = $this->register($email, $name, $password);
         return $user ? $this->createTokenAndFetchToken($user) : null;
+    }
+
+    /**
+     * @param $userId
+     * @return bool
+     */
+    public function tokenCheck($userId)
+    {
+        return auth('sanctum')->check() && strval(optional(auth('sanctum')->user())->id) === $userId;
     }
 
     /**
