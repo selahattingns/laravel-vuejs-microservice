@@ -13,7 +13,5 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['middleware' => 'authCheck'], function (){
-    Route::get('list', [\App\Http\Controllers\NoteController::class, 'getList']);
-});
+
 

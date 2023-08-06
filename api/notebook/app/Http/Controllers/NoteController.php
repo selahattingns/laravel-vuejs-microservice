@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Codes\Note\Services\NoteService;
+use App\Http\Requests\NoteStoreRequest;
 use Illuminate\Http\Request;
 
 class NoteController extends Controller
@@ -27,6 +28,24 @@ class NoteController extends Controller
      */
     public function getList(Request $request)
     {
-        return $this->noteService->getList($request->user_id);
+        return $this->noteService->getList($request->header('user_id'));
+    }
+
+    /**
+     * @param NoteStoreRequest $request
+     * @return mixed
+     */
+    public function store(NoteStoreRequest $request)
+    {
+        return $this->noteService->store($request->header('user_id'), $request->title, $request->note);
+    }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function delete(Request $request, $id)
+    {
+        return $this->noteService->delete($request->header('user_id'), $id);
     }
 }
