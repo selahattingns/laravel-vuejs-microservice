@@ -1,5 +1,6 @@
 Small scale microservice application on "note book"
 
+---
 **Client;**
 
 *VueJs variables;*
@@ -7,7 +8,8 @@ Small scale microservice application on "note book"
     authApiUrl: "http://localhost:8000/api",
     notebookApiUrl: "http://localhost:8001/api",
     
--
+
+---
 **Api;**
 
 *Auth Project;*
@@ -23,3 +25,8 @@ Small scale microservice application on "note book"
     command: composer dumpautoload
     command: php artisan migrate
     command: php artisan serve --port=8001
+
+---
+**Structure;**
+
+![image Structure](images/structure.PNG)
