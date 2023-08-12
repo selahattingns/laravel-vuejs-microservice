@@ -51,6 +51,6 @@ class AuthController extends Controller
      */
     public function tokenCheck(Request $request)
     {
-        return response()->json($this->authService->tokenCheck($request->header('user_id')));
+        return response()->json($this->authService->tokenCheck($request->header('userid')));
     }
 }

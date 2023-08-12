@@ -19,11 +19,11 @@ class AuthCheckMiddleware
     {
         $response = Http::withHeaders([
             'Authorization' => $request->header('Authorization'),
-            'user_id' => $request->header('user_id')
+            'userId' => $request->header('userId')
         ])->post('http://localhost:8000/api/tokenCheck');
 
         if ($response->json() === true) {
-            $request->user_id = $request->header('user_id');
+            $request->user_id = $request->header('userId');
             return $next($request);
         }
         return response()->json(['token error', 401]);

@@ -36,6 +36,10 @@ class NoteService
      */
     public function store($userId, $title, $note)
     {
+        $store = $this->noteRepository->store($userId, $title, $note);
+        if ($store){
+
+        }
         return $this->noteRepository->store($userId, $title, $note);
     }
 

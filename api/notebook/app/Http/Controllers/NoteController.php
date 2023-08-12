@@ -28,7 +28,7 @@ class NoteController extends Controller
      */
     public function getList(Request $request)
     {
-        return $this->noteService->getList($request->header('user_id'));
+        return $this->noteService->getList($request->header('userId'));
     }
 
     /**
@@ -37,7 +37,7 @@ class NoteController extends Controller
      */
     public function store(NoteStoreRequest $request)
     {
-        return $this->noteService->store($request->header('user_id'), $request->title, $request->note);
+        return $this->noteService->store($request->header('userId'), $request->title, $request->note);
     }
 
     /**
@@ -46,6 +46,6 @@ class NoteController extends Controller
      */
     public function delete(Request $request, $id)
     {
-        return $this->noteService->delete($request->header('user_id'), $id);
+        return $this->noteService->delete($request->header('userId'), $id);
     }
 }

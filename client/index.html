@@ -97,6 +97,7 @@
                 },
                 authApiUrl: "http://localhost:8000/api",
                 notebookApiUrl: "http://localhost:8001/api",
+                logApiUrl: "http://127.0.0.1:5000/api",
                 token: null,
                 user_id: null,
                 notes: [],
@@ -167,13 +168,27 @@
                     },
                     success: function(result){
                         thisClass.notes.push(result);
+                        thisClass.getLogs(result);
+                    }
+                });
+            },
+            getLogs(data){
+                let thisClass = this;
+                let headers = thisClass.getHeaders();
+                $.ajax({
+                    url: this.logApiUrl + "/logs",
+                    method: "get",
+                    headers: headers,
+                    data: JSON.stringify(data),
+                    success: function(result){
+                        console.log(result);
                     }
                 });
             },
             getHeaders(){
                 return {
                     Authorization: "Bearer " + this.token,
-                    user_id: this.user_id
+                    userId: this.user_id
                 };
             },
             deleteNote(index, id){
