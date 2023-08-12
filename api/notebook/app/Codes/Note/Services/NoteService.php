@@ -2,6 +2,8 @@
 namespace App\Codes\Note\Services;
 
 use App\Codes\Note\Interfaces\NoteInterface;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Http;
 
 class NoteService
 {
@@ -38,7 +40,14 @@ class NoteService
     {
         $store = $this->noteRepository->store($userId, $title, $note);
         if ($store){
-
+            try{
+                Http::withHeaders([
+                    'Authorization' => request()->header('Authorization'),
+                    'userId' => request()->header('userId')
+                ])->post('http://127.0.0.1:5000/api/logs', [
+                    "title" => $title
+                ]);
+            }catch (ConnectionException $exception){}
         }
         return $this->noteRepository->store($userId, $title, $note);
     }
